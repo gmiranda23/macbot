@@ -287,7 +287,7 @@ echo "Install and configure git."
 run brew install git
 run brew upgrade git
 run git config --global user.email "george.miranda@gmail.com"
-git config --global user.name "gmiranda23"
+run git config --global user.name "gmiranda23"
 
 
 # List of all brew packages to install
