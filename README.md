@@ -16,4 +16,4 @@ Macbot is a shell script to automatically configure your Mac with sane and secur
 
 # Blog Post
 
-Want more details? Check out the blog post I wrote about using this script. https://medium.com/@echohack/guide-to-make-your-mac-suck-less-2017-88a57563aac7#.iwo8hrmw6
+This repo is based on [echohack's macbot](https://github.com/echohack/macbot). I've updated it for Catalina, my own preferences, and refactored a bit. See that repo for more background and details.

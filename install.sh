@@ -1,53 +1,67 @@
-#!/usr/bin/env bash
+#!/usr/local/bin/bash
 
-# Current User
-user=$(id -un)
+#---------------#
+# Color palette #
+#---------------#
+reset=$(tput sgr0)
+bold=$(tput bold)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+highlight1=$(echo -e "setaf 7\nsetab 1" | tput -S)	# set fg white & bg red
+highlight2=$(echo -e "setaf 7\nsetab 2" | tput -S)	# set fg white & bg green
 
-# Script's color palette
-reset="\033[0m"
-highlight="\033[42m\033[97m"
-dot="\033[33m▸ $reset"
-dim="\033[2m"
-bold="\033[1m"
-
-# Keep-alive: update existing `sudo` time stamp until script has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
+#-------------------#
+# Logging functions #
+#-------------------#
 headline() {
-    printf "${highlight} %s ${reset}\n" "$@"
+  printf "${highlight1} %s ${reset}\n" "$@"
 }
 
 chapter() {
-    echo "${highlight} $((count++)).) $@ ${reset}\n"
+  echo "${highlight2} $((count++)).) $@ ${reset}"
+  echo
 }
 
 # Prints out a step, if last parameter is true then without an ending newline
 step() {
-    if [ $# -eq 1 ]
-    then echo "${dot}$@"
-    else echo "${dot}$@"
-    fi
+  if [ $# -eq 1 ]
+    then echo "${yellow}▸ ${reset}$@"
+    else echo "${yellow}▸ ${reset}$@"
+  fi
 }
 
+# Prints out commands, then runs then
 run() {
-    echo "${dim}▹ $@ $reset"
-    eval $@
+  echo "  ${green}▹ $@ $reset"
+  eval $@
 }
 
-echo ""
-headline " Let's secure your Mac and install basic applications."
-echo ""
-echo "Modifying settings for user: $user."
-# Close any open System Preferences panes, to prevent them from overriding
-# settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'
+#------#
+# Init #
+#------#
+user=$(id -un)						# current user
+
+# Keep-alive: update existing `sudo` time stamp until script has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+echo
+headline "                           "
+headline " Let's secure your Mac and install basic applications. "
+headline "                           "
+
+
+echo
+chapter "Modifying settings for user: $user."
+
+step "Closing any open System Preferences panes, to prevent them from overriding settings we’re about to change."
+run osascript -e 'tell application "System Preferences" to quit'
 
 # Ask for the administrator password upfront
 if [ $(sudo -n uptime 2>&1|grep "load"|wc -l) -eq 0 ]
 then
-    step "Some of these settings are system-wide, therefore we need your permission."
-    sudo -v
-    echo ""
+  step "Some of these settings are system-wide, therefore we need your permission."
+  sudo -v
+  echo
 fi
 
 step "Setting your computer name (as done via System Preferences → Sharing)."
@@ -63,7 +77,10 @@ run sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.s
 echo "Enable bash autocomplete"
 run sudo cp ./files/inputrc ~/.inputrc
 
-# UX And Performance Improvements
+
+echo
+chapter "Making UX and performance improvements."
+
 echo "Disable sudden motion sensor. (Not useful for SSDs)."
 run sudo pmset -a sms 0
 
@@ -129,20 +146,13 @@ run defaults write DSDontWriteNetworkStores com.apple.desktopservices -int 1
 echo "Don't ask to use external drives as a Time Machine backup."
 run defaults write DoNotOfferNewDisksForBackup com.apple.TimeMachine -int 1
 
-# Disabled UX tweaks
-#echo "Disable natural scrolling."
-#run defaults write ~/Library/Preferences/.GlobalPreferences com.apple.swipescrolldirection -bool false
-#
-#echo "Disable press-and-hold for keys in favor of key repeat."
-#run defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-#
-#echo "Use the dark theme."
-#run defaults write ~/Library/Preferences/.GlobalPreferences AppleInterfaceStyle -string "Dark"
-#
-#echo "Turn off increased contrast. macOS 10.14 causes ugly white borders."
-#run defaults write com.apple.universalaccess increaseContrast -int 0
+echo "Use the dark theme."
+run defaults write ~/Library/Preferences/.GlobalPreferences AppleInterfaceStyle -string "Dark"
 
-# Security And Privacy Improvements
+
+echo
+chapter "Making security and privacy improvements."
+
 echo "Disable Safari from auto-filling sensitive data."
 run defaults write ~/Library/Preferences/com.apple.Safari AutoFillCreditCardData -bool false
 run defaults write ~/Library/Preferences/com.apple.Safari AutoFillFromAddressBook -bool false
@@ -152,19 +162,19 @@ run defaults write ~/Library/Preferences/com.apple.Safari AutoFillPasswords -boo
 echo "Disable Safari from automatically opening files."
 run defaults write ~/Library/Preferences/com.apple.Safari AutoOpenSafeDownloads -bool false
 
-#echo "Always block cookies and local storage in Safari."
-#run defaults write ~/Library/Preferences/com.apple.Safari BlockStoragePolicy -bool false
-
 echo "Enable Safari warnings when visiting fradulent websites."
 run defaults write ~/Library/Preferences/com.apple.Safari WarnAboutFraudulentWebsites -bool true
-
-#echo "Disable javascript in Safari."
-#run defaults write ~/Library/Preferences/com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptEnabled -bool false
-#run defaults write ~/Library/Preferences/com.apple.Safari WebKitJavaScriptEnabled -bool false
 
 echo "Block popups in Safari."
 run defaults write ~/Library/Preferences/com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically -bool false
 run defaults write ~/Library/Preferences/com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically -bool false
+
+#echo "Always block cookies and local storage in Safari."
+#run defaults write ~/Library/Preferences/com.apple.Safari BlockStoragePolicy -bool false
+
+#echo "Disable javascript in Safari."
+#run defaults write ~/Library/Preferences/com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptEnabled -bool false
+#run defaults write ~/Library/Preferences/com.apple.Safari WebKitJavaScriptEnabled -bool false
 
 #echo "Disable plugins and extensions in Safari."
 #run defaults write ~/Library/Preferences/com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2WebGLEnabled -bool false
@@ -193,11 +203,6 @@ run defaults write ~/Library/Preferences/com.apple.Safari SendDoNotTrackHTTPHead
 echo "Display full website addresses in Safari."
 run defaults write ~/Library/Preferences/com.apple.Safari ShowFullURLInSmartSearchField -bool true
 
-#echo "Disable loading remote content in emails in Apple Mail."
-#run defaults write ~/Library/Preferences/com.apple.mail-shared DisableURLLoading -bool true
-
-#echo "Send junk mail to the junk mail box in Apple Mail."
-#run defaults write ~/Library/Containers/com.apple.mail/Data/Library/Preferences/com.apple.mail JunkMailBehavior -int 2
 
 echo "Disable spotlight universal search (don't send info to Apple)."
 run defaults write com.apple.safari UniversalSearchEnabled -int 0
@@ -208,7 +213,7 @@ run python ./fix_leaky_data.py
 echo "Disable Captive Portal Hijacking Attack."
 run defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
 
-echo "Set screen to lock as soon as the screensaver starts."
+echo "Set screen to lock almost as soon as the screensaver starts."
 run defaults write com.apple.screensaver askForPassword -int 1
 run defaults write com.apple.screensaver askForPasswordDelay -int 5
 
@@ -249,27 +254,21 @@ run defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
 #echo "Turn on Mac App Store auto-update."
 #run defaults write com.apple.commerce AutoUpdate -bool true
 
-# Blocklists
 
-#echo "Block all Facebook domains."
-#if ! grep --quiet facebook /etc/hosts; then
-#    run cat block_facebook | sudo tee -a /etc/hosts
-#else
-#    echo "${dim}▹ Facebook domains already blocked. $reset"
-#fi
+echo
+chapter "Install CLI applications with homebrew"
 
-# Install Applications
+# Note: Before installing Homebrew, set the following for increased privacy.
+export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_INSECURE_REDIRECT=1
 
-# Note: Before installing Homebrew, set the following settings in your .bash_profile for increased privacy.
-# export HOMEBREW_NO_ANALYTICS=1
-# export HOMEBREW_NO_INSECURE_REDIRECT=1
-#echo "Install Homebrew."
-#which -s brew
-#if [[ $? != 0 ]] ; then
-#    run '/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"'
-#else
-#    run brew update
-#fi
+echo "Install Homebrew."
+which -s brew
+if [[ $? != 0 ]] ; then
+    run '/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"'
+else
+    run brew update
+fi
 
 echo "Install brew taps."
 run brew tap "homebrew/core"
@@ -277,108 +276,50 @@ run brew tap "homebrew/bundle"
 run brew tap "homebrew/cask"
 run brew tap "homebrew/cask-fonts"
 
-echo "Installing a modern BASH and setting that as your shell."
+echo "Installing a modern BASH and making that a valid shell."
 run brew install bash
-run sudo echo "/usr/local/bin/bash" >> /etc/shells
-run chsh -s /usr/local/bin/bash
+run brew update bash
+run sudo -s 'echo "/usr/local/bin/bash" >> /etc/shells'
+# To set BASH as your shell, uncomment this line
+#run chsh -s /usr/local/bin/bash
 
 echo "Install and configure git."
 run brew install git
+run brew update git
 run git config --global user.email "george.miranda@gmail.com"
 git config --global user.name "gmiranda23"
 
-echo "Install jq."
-run brew install jq
 
-echo "Install mas (Mac App Store Command Line)."
-run brew install mas
+# List of all brew packages to install
+brewcli="fd fzf jq mas ripgrep thefuck speedtest-cli wget youtube-dl ffmpeg"
 
-echo "Install youtube-dl."
-run brew install youtube-dl
-run brew upgrade youtube-dl
-run brew install ffmpeg
-run brew upgrade ffmpeg
-
-echo "Install fd (find alternative)."
-run brew install "fd"
-
-echo "Install fuzzy find CLI tool."
-run brew install "fzf"
-
-echo "Install ripgrep finder."
-run brew install "ripgrep"
-
-echo "Install thefuck CLI helper."
-run brew install "thefuck"
+for i in $brewcli ; do
+  echo "Install $i"
+  run brew install $i
+  run brew upgrade $i
+done
 
 
-# Install basic apps from brew cask
-echo "Install Atom editor."
-run brew cask "atom"
+echo
+chapter "Install basic apps from brew cask"
 
-echo "Install Audacity."
-#run brew cask "audacity"
+# List of all brew cask apps 
+brewcasks="atom audacity caffeine choosy dropbox firefox font-hack-nerd-font font-inconsolata-for-powerline
+           google-chrome iterm2 krisp macvim menumeters moom paintbrush screenflow skype spotify timer vlc zoomus"
 
-echo "Install Caffeine."
-run brew cask "caffeine"
-
-echo "Install Choosy."
-run brew cask "choosy"
-
-echo "Install Dropbox."
-run brew cask "dropbox"
-
-echo "Install Firefox."
-run brew cask "firefox"
-
-echo "Install Chrome."
-run brew cask "google-chrome"
-
-echo "Install iTerm2."
-run brew cask "iterm2"
-
-echo "Install Krisp."
-run brew cask "krisp"
-
-echo "Install MacVim."
-run brew cask "macvim"
-
-echo "Install Menumeters."
-run brew cask "menumeters"
-
-echo "Install Moom."
-run brew cask "moom"
-
-echo "Install Paintbrush."
-run brew cask "paintbrush"
-
-echo "Install Screenflow."
-run brew cask "screenflow"
-
-echo "Install Skype."
-run brew cask "skype"
-
-echo "Install Spotify."
-run brew cask "spotify"
-
-echo "Install Timer."
-run brew cask "timer"
-
-#echo "Install VLC."
-#run brew cask install vlc
-
-echo "Install Zoom."
-run brew cask "zoomus"
-
-echo "Install terminal fonts."
-run brew cask install "font-hack-nerd-font"
-run brew cask install "font-inconsolata-for-powerline"
+for ii in $brewcasks ; do
+  echo "Install $ii"
+  run brew cask install $ii
+done
 
 
-# Install all the Mac App Store applications using mas. https://github.com/mas-cli/mas
+echo
+chapter "Install Mac App Store applications (using mas-cli - https://github.com/mas-cli/mas)."
+
+# New for Catalina: you must already be logged into the app store for this to work
 mac_app_login=$(mas account | grep @)
 if [ -z "$mac_app_login" ] ; then
-    chapter "Let's install Mac App Store applications. What is your Mac App Store email login? $bold"
+    echo "To install Mac App Store applications, you must be logged in. What is your Mac App Store email login? $bold"
     read mac_app_login
     run mas signin $mac_app_login
 fi
@@ -386,11 +327,11 @@ fi
 echo "Install 1Password 7."
 run mas install 1333542190
 
-echo "Install Activity Timer."
-run mas install 808647808
+#echo "Install Activity Timer."
+#run mas install 808647808
 
-#echo "Install Keynote."
-#run mas install 409183694
+echo "Install Keynote."
+run mas install 409183694
 
 echo "Install Slack."
 run mas install 803453959
@@ -401,18 +342,31 @@ run mas install 1153157709
 echo "Install Things3."
 run mas install 904280696
 
+echo "Install Tweetdeck."
+run mas install 485812721
+
 echo "Install Xcode."
 run mas install 497799835
 
 echo "Upgrade any Mac App Store applications."
 run mas upgrade
 
+
+echo
+chapter "Final updates and restarts."
+
 echo "Run one final check to make sure software is up to date."
 run softwareupdate -i -a
 
+echo "Restart System Services."
 run killall Dock
 run killall Finder
 run killall SystemUIServer
 
-chapter "Some settings will not take effect until you restart your computer."
-headline " Your Mac is setup and ready!"
+
+headline "Some settings will not take effect until you restart your computer."
+echo
+headline "               "
+headline " Your Mac is set up and ready! "
+headline "               "
+echo
