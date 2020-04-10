@@ -279,7 +279,7 @@ run brew tap "homebrew/cask-fonts"
 echo "Installing a modern BASH and making that a valid shell."
 run brew install bash
 run brew upgrade bash
-run sudo -s 'echo "/usr/local/bin/bash" >> /etc/shells'
+run sudo 'echo "/usr/local/bin/bash" >> /etc/shells'
 # To set BASH as your shell, uncomment this line
 #run chsh -s /usr/local/bin/bash
 
