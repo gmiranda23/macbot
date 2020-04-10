@@ -278,14 +278,14 @@ run brew tap "homebrew/cask-fonts"
 
 echo "Installing a modern BASH and making that a valid shell."
 run brew install bash
-run brew update bash
+run brew upgrade bash
 run sudo -s 'echo "/usr/local/bin/bash" >> /etc/shells'
 # To set BASH as your shell, uncomment this line
 #run chsh -s /usr/local/bin/bash
 
 echo "Install and configure git."
 run brew install git
-run brew update git
+run brew upgrade git
 run git config --global user.email "george.miranda@gmail.com"
 git config --global user.name "gmiranda23"
 
@@ -303,8 +303,8 @@ done
 echo
 chapter "Install basic apps from brew cask"
 
-# List of all brew cask apps 
-brewcasks="atom audacity caffeine choosy dropbox firefox font-hack-nerd-font font-inconsolata-for-powerline
+# List of all brew cask apps
+brewcasks="atom audacity caffeine choosy dropbox firefox flux font-hack-nerd-font font-inconsolata-for-powerline
            google-chrome iterm2 krisp macvim menumeters moom paintbrush screenflow skype spotify timer vlc zoomus"
 
 for ii in $brewcasks ; do
