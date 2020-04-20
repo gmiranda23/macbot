@@ -345,6 +345,9 @@ run mas install 904280696
 echo "Install Tweetdeck."
 run mas install 485812721
 
+echo "Install Webcam Settings"
+run mas install 533696630
+
 echo "Install Xcode."
 run mas install 497799835
 
