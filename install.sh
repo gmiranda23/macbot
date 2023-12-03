@@ -271,23 +271,11 @@ run defaults write com.apple.commerce AutoUpdate -bool true
 #    echo "${dim}▹ Facebook domains already blocked. $reset"
 #fi
 
-#-------------------#
-# Download software #
-#-------------------#
-# Eventually we'll automate the installs of each of these, or they're older
-# The biggest challenege is just remembering which apps you need 
-echo
-chapter "Downloading some software for manual installation later."
-
-download_file "https://central.github.com/deployments/desktop/desktop/latest/darwin" "github-latest.dmg"
-download_file "https://updates.signal.org/desktop/signal-desktop-mac-1.25.3.zip" "signal-desktop-mac-1.25.3.zip"
-download_file "https://www.telestream.net/download-files/screenflow/9-0/ScreenFlow-9.0.8.dmg" "ScreenFlow-9.0.8.dmg"
-
 #-----------------------#
-# Brew install software #
+# Install software deps #
 #-----------------------#
 echo
-chapter "Installing CLI applications with homebrew"
+chapter "Installing system software dependencies."
 
 # Note: Before installing Homebrew, set the following in your .bash_profile for increased privacy.
 #export HOMEBREW_NO_ANALYTICS=1
@@ -301,47 +289,56 @@ else
     run brew update
 fi
 
+echo "Install Mac App Store CLI"
+run brew install mas
+run brew upgrade mas
+
+echo "Checking for Mac App Store credentials..."
+mac_app_login=$(mas account | grep @)
+if [ -z "$mac_app_login" ] ; then
+  chapter "What is your Mac App Store email login? $bold"
+  read mac_app_login
+  run mas signin $mac_app_login
+fi
+
+echo "Install Xcode"
+run mas install 497799835
+
+#-----------------------#
+# Brew install software #
+#-----------------------#
+echo
+chapter "Installing CLI applications with homebrew"
+
 echo "Install and configure git."
 run brew install git
 run brew upgrade git
 run git config --global user.email "george.miranda@gmail.com"
 run git config --global user.name "gmiranda23"
 
-#-------------------------------------
 # List of all brew packages to install
 #-------------------------------------
-# jq - A lightweight and flexible command-line JSON processor
-# wget - Internet file retriever
 # node - nodeJS (to get npm)
-# shellcheck - Static analysis and lint tool, for (ba)sh scripts
-# tldr - Simplified and community-driven man pages
-# speedtest-cli - Command-line interface for https://speedtest.net bandwidth tests
 # ffmpeg - Play, record, convert, and stream audio and video
+# jq - A lightweight and flexible command-line JSON processor
+# shellcheck - Static analysis and lint tool, for (ba)sh scripts
+# speedtest-cli - Command-line interface for https://speedtest.net bandwidth tests
+# tldr - Simplified and community-driven man pages
+# wget - Internet file retriever
 # youtube-dl - Download YouTube videos from the command-line (deprecated, but still handy)
 # yt-dlp - Fork of youtube-dl with additional features and fixes
-# mas - Mac App Store command-line interface
 
-brewcli="
-  jq
-  wget
-  node
-  shellcheck
-  tldr
-  speedtest-cli
-  ffmpeg
-  youtube-dl
-  yt-dlp
-  mas
-"
+brewcli="node ffmpeg jq shellcheck speedtest-cli tldr wget youtube-dl yt-dlp"
+
 for i in $brewcli ; do
   echo "Install $i"
   run brew install $i
   run brew upgrade $i
 done
 
-#----------------------------------
 # List of all brew casks to install
 #----------------------------------
+# aerial - Apple TV Aerial screensaver
 # atom - GitHub Atom Editor (discontinued upstream)
 # audacity - Multi-track audio editor and recorder
 # choosy - Open links in any browser
@@ -359,17 +356,16 @@ done
 # firefox - Mozilla Firefox web browser
 # google-chrome - Google Chrome web browser
 
-brewcasks="atom audacity choosy dropbox iterm2 menumeters moom paintbrush skype spotify timer
-vlc visual-studio-code zoom firefox google-chrome"
+brewcasks="aerial atom audacity choosy dropbox iterm2 menumeters moom paintbrush
+skype spotify timer vlc visual-studio-code zoom firefox google-chrome"
 
 for ii in $brewcasks ; do
   echo "Install $ii"
   run brew install --cask $ii
 done
 
-#------------------------------#
-# Configure installed software #
-#------------------------------#
+# Configure brew software 
+#------------------------
 echo
 chapter "Configuring homebrew installed software"
 
@@ -396,13 +392,6 @@ run defaults write com.google.Chrome RestrictSigninToPattern -string ".*@example
 echo
 chapter "Installing Mac App Store applications."
 
-mac_app_login=$(mas account | grep @)
-if [ -z "$mac_app_login" ] ; then
-  chapter "What is your Mac App Store email login? $bold"
-  read mac_app_login
-  run mas signin $mac_app_login
-fi
-
 #--------------------------------------
 # List of all mas apps to install
 # format: ["pkg_id"]="Descriptive name"
@@ -427,6 +416,18 @@ done
 # App store updates
 echo "Upgrade any Mac App Store applications."
 run mas upgrade
+
+#-------------------------#
+# Install system software #
+#-------------------------#
+# Eventually we'll automate the installs of each of these, or they're older
+# The biggest challenege is just remembering which apps you need 
+echo
+chapter "Downloading some software for manual installation later."
+
+download_file "https://central.github.com/deployments/desktop/desktop/latest/darwin" "github-latest.dmg"
+download_file "https://updates.signal.org/desktop/signal-desktop-mac-1.25.3.zip" "signal-desktop-mac-1.25.3.zip"
+download_file "https://www.telestream.net/download-files/screenflow/9-0/ScreenFlow-9.0.8.dmg" "ScreenFlow-9.0.8.dmg"
 
 #---------------#
 # Final updates #
