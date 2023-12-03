@@ -1,32 +1,42 @@
 # These functions are the public API used by install.sh
 
-# Script's color palette
-reset="\033[0m"
-highlight="\033[42m\033[97m"
-dot="\033[33m▸ $reset"
-dim="\033[2m"
-bold="\033[1m"
+#---------------#
+# Color palette #
+#---------------#
+reset=$(tput sgr0)
+bold=$(tput bold)
+dim=$(tput dim)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+highlight1=$(echo -e "setaf 7\nsetab 1" | tput -S)	# set fg white & bg red
+highlight2=$(echo -e "setaf 7\nsetab 2" | tput -S)	# set fg white & bg green
 
+#-------------------#
+# Logging functions #
+#-------------------#
 headline() {
-    printf "${highlight} %s ${reset}\n" "$@"
+  printf "${highlight1} %s ${reset}\n" "$@"
 }
 
 chapter() {
-    echo "${highlight} $((count++)).) $@ ${reset}\n"
+  echo "${highlight2} $((count++)).) $@ ${reset}"
+  echo
 }
 
 # Prints out a step, if last parameter is true then without an ending newline
 step() {
-    if [ $# -eq 1 ]
-    then echo "${dot}$@"
-    else echo "${dot}$@"
-    fi
+  if [ $# -eq 1 ]
+    then echo "${yellow}▸ ${reset}$@"
+    else echo "${yellow}▸ ${reset}$@"
+  fi
 }
 
+# Prints out commands, then runs then
 run() {
-    echo "${dim}▹ $@ $reset"
-    eval $@
+  echo "  ${green}▹ $@ $reset"
+  eval $@
 }
+
 
 # Downloads a file from a source URL to a local file.
 # uses an optional shasum to determine if an existing file can be used.
