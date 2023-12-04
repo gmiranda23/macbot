@@ -254,8 +254,8 @@ run defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 #echo "Set all network interfaces to use Cloudflare DNS (1.1.1.1)."
 #run bash ./use_cloudflare_dns.sh
 
-echo "Disable wake on network access."
-run sudo systemsetup -setwakeonnetworkaccess off
+#echo "Disable wake on network access."
+#run sudo systemsetup -setwakeonnetworkaccess off
 
 #echo "Disable Bonjour multicast advertisements."
 #run defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool YES
