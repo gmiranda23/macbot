@@ -69,17 +69,6 @@ echo "Install Mac App Store CLI"
 run brew install mas
 run brew upgrade mas
 
-echo "Checking for Mac App Store credentials..."
-mac_app_login=$(mas account | grep @)
-if [ -z "$mac_app_login" ] ; then
-  chapter "What is your Mac App Store email login? $bold"
-  read mac_app_login
-  run mas signin $mac_app_login
-fi
-
-echo "Install Xcode"
-run mas install 497799835
-
 #-----------------#
 # UX Improvements #
 #-----------------#
@@ -247,7 +236,7 @@ echo "Disable spotlight universal search (don't send info to Apple)."
 run defaults write com.apple.safari UniversalSearchEnabled -int 0
 
 echo "Disable Spotlight Suggestions, Bing Web Search, and other leaky data."
-run python ./fix_leaky_data.py
+run python3 ./fix_leaky_data.py
 
 echo "Set screen to lock almost as soon as the screensaver starts."
 run defaults write com.apple.screensaver askForPassword -int 1
@@ -394,11 +383,9 @@ chapter "Installing Mac App Store applications."
 declare -A mas_array=(
   ["1333542190"]="1Password 7"
   ["808647808"]="Activity Timer"
-  ["409183694"]="Keynote"
   ["803453959"]="Slack"
   ["1153157709"]="Speedtest by Ookla"
   ["533696630"]="Webcam Settings"
-  ["497799835"]="Xcode"
 )
 
 for key in ${!mas_array[@]}
