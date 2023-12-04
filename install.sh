@@ -82,7 +82,7 @@ echo "Disable sudden motion sensor. (Not useful for SSDs)."
 run sudo pmset -a sms 0
 
 echo "Use 24-hour time. Use the format EEE MMM d  H:mm:ss"
-run defaults write com.apple.menuextra.clock DateFormat -string 'EEE d MMM HH:mm:ss'
+run defaults write com.apple.menuextra.clock DateFormat -string "'EEE d MMM HH:mm:ss'"
 
 echo "Set a fast keyboard repeat rate, after a good initial delay."
 run defaults write NSGlobalDomain KeyRepeat -int 1
@@ -94,8 +94,14 @@ run defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool fal
 echo "Speed up mission control animations."
 run defaults write com.apple.dock expose-animation-duration -float 0.1
 
+echo "Auto hide the dock."
+run defaults write com.apple.dock autohide -bool true
+
 echo "Remove the auto-hiding dock delay."
 run defaults write com.apple.dock autohide-delay -int 0
+
+echo "Magnify dock icons, but only a little."
+run defaults write com.apple.dock largesize -int 90
 
 echo "Save screenshots in PNG format."
 run defaults write com.apple.screencapture type -string png
@@ -425,19 +431,20 @@ chapter "Final updates and restarts."
 echo "Run one final check to make sure software is up to date."
 run softwareupdate -i -a
 
-echo
-headline "                          "
-headline " Your Mac is set up and ready!"
-headline " Some settings will not take effect until you reboot."
-headline "                          "
-
-sec=10; while [ $sec -ge 0 ]; do
-  echo -ne "Rebooting in $sec\033[0K\r"
-  let "sec=sec-1"
-  sleep 1
-done
-
 echo "Restart System Services."
 run killall Dock
 run killall Finder
 run killall SystemUIServer
+
+echo
+headline "                          "
+headline " Your Mac is set up and ready!"
+headline " Some settings will not take effect until you reboot."
+headline " Automatic reboot in progress unless cancelled...
+headline "                          "
+echo
+sec=60; while [ $sec -ge 0 ]; do
+  echo -ne "Rebooting in $sec\033[0K\r"
+  let "sec=sec-1"
+  sleep 1
+done
