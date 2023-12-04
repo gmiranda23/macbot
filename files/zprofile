@@ -1,0 +1,2 @@
+path+=('/opt/homebrew/bin')
+export PATH

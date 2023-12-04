@@ -61,6 +61,10 @@ else
     run brew update
 fi
 
+echo "Add homerbew to PATH."
+run sudo cp ./files/zprofile ~/.zprofile
+run source ~/.zprofile
+
 echo "Install Mac App Store CLI"
 run brew install mas
 run brew upgrade mas
