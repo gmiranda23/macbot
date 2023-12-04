@@ -1,5 +1,11 @@
 # These functions are the public API used by install.sh
 
+#-----------#
+# Exec path #
+#-----------#
+PATH=$PATH:/opt/homebrew/bin
+export PATH
+
 #---------------#
 # Color palette #
 #---------------#
