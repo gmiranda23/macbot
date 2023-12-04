@@ -410,6 +410,12 @@ download_file "https://central.github.com/deployments/desktop/desktop/latest/dar
 download_file "https://updates.signal.org/desktop/signal-desktop-mac-1.25.3.zip" "signal-desktop-mac-1.25.3.zip"
 download_file "https://www.telestream.net/download-files/screenflow/9-0/ScreenFlow-9.0.8.dmg" "ScreenFlow-9.0.8.dmg"
 
+#-------------------#
+# Install oh-my-zsh #
+#-------------------#
+echo "Install oh-my-zsh"
+run 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+
 #---------------#
 # Final updates #
 #---------------#
