@@ -380,7 +380,7 @@ chapter "Installing Mac App Store applications."
 # format: ["pkg_id"]="Descriptive name"
 # (use 'mas search' to maintain)
 #--------------------------------------
-declare -A mas_array=(
+declare -a mas_array=(
   ["1333542190"]="1Password 7"
   ["808647808"]="Activity Timer"
   ["803453959"]="Slack"
