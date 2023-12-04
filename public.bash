@@ -19,7 +19,7 @@ headline() {
 }
 
 chapter() {
-  echo "${highlight2} $((count++)).) $@ ${reset}"
+  echo "${highlight2} $((count++))) $@ ${reset}"
   echo
 }
 

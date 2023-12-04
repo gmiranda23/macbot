@@ -43,6 +43,39 @@ run sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.s
 echo "Set bash autocomplete & preferences"
 run sudo cp ./files/inputrc ~/.inputrc
 
+#-----------------------#
+# Install software deps #
+#-----------------------#
+echo
+chapter "Installing system software dependencies."
+
+# Note: Before installing Homebrew, set the following in your .bash_profile for increased privacy.
+#export HOMEBREW_NO_ANALYTICS=1
+#export HOMEBREW_NO_INSECURE_REDIRECT=1
+
+echo "Install Homebrew."
+which -s brew
+if [[ $? != 0 ]] ; then
+    run '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+else
+    run brew update
+fi
+
+echo "Install Mac App Store CLI"
+run brew install mas
+run brew upgrade mas
+
+echo "Checking for Mac App Store credentials..."
+mac_app_login=$(mas account | grep @)
+if [ -z "$mac_app_login" ] ; then
+  chapter "What is your Mac App Store email login? $bold"
+  read mac_app_login
+  run mas signin $mac_app_login
+fi
+
+echo "Install Xcode"
+run mas install 497799835
+
 #-----------------#
 # UX Improvements #
 #-----------------#
@@ -56,7 +89,7 @@ echo "Disable sudden motion sensor. (Not useful for SSDs)."
 run sudo pmset -a sms 0
 
 echo "Use 24-hour time. Use the format EEE MMM d  H:mm:ss"
-run defaults write com.apple.menuextra.clock DateFormat -string 'EEE MMM d  H:mm:ss'
+run defaults write com.apple.menuextra.clock DateFormat -string 'EEE d MMM HH:mm:ss'
 
 echo "Set a fast keyboard repeat rate, after a good initial delay."
 run defaults write NSGlobalDomain KeyRepeat -int 1
@@ -79,10 +112,7 @@ run mkdir ~/Screenshots
 run defaults write com.apple.screencapture location -string ~/Screenshots
 
 echo "Disable shadow in screenshots."
-defaults write com.apple.screencapture disable-shadow -bool true
-
-echo "Disable menu transparency."
-run defaults write com.apple.universalaccess reduceTransparency -int 1
+run defaults write com.apple.screencapture disable-shadow -bool true
 
 echo "Disable mouse enlargement with jiggle."
 run defaults write ~/Library/Preferences/.GlobalPreferences CGDisableCursorLocationMagnification -bool true
@@ -124,28 +154,28 @@ echo "Always show scrollbars."
 run defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
 
 echo "Expand save panel by default."
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+run defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+run defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
 
 echo "Expand print panel by default."
-defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
-defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
+run defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+run defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
 
 #echo "Disable automatic capitalization."
-#defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
-#
+#run defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+
 #echo "Disable smart dashes."
-#defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+#run defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 echo "Disable automate period substitution."
-defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+run defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
 
 echo "Disable smart quotes."
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+run defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 
 #echo "Enable subpixel font rendering on non-Apple LCDs."
 ## Reference: https://github.com/kevinSuttle/macOS-Defaults/issues/17#issuecomment-266633501
-#defaults write NSGlobalDomain AppleFontSmoothing -int 1
+#run defaults write NSGlobalDomain AppleFontSmoothing -int 1
 
 echo "Use the dark theme."
 run defaults write ~/Library/Preferences/.GlobalPreferences AppleInterfaceStyle -string "Dark"
@@ -163,7 +193,7 @@ run defaults write ~/Library/Preferences/com.apple.Safari AutoFillMiscellaneousF
 run defaults write ~/Library/Preferences/com.apple.Safari AutoFillPasswords -bool false
 
 echo "Enable Do Not Track in Safari."
-defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
+run defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
 
 echo "Disable Safari from automatically opening files."
 run defaults write ~/Library/Preferences/com.apple.Safari AutoOpenSafeDownloads -bool false
@@ -209,15 +239,11 @@ run defaults write ~/Library/Preferences/com.apple.Safari SendDoNotTrackHTTPHead
 echo "Display full website addresses in Safari."
 run defaults write ~/Library/Preferences/com.apple.Safari ShowFullURLInSmartSearchField -bool true
 
-
 echo "Disable spotlight universal search (don't send info to Apple)."
 run defaults write com.apple.safari UniversalSearchEnabled -int 0
 
 echo "Disable Spotlight Suggestions, Bing Web Search, and other leaky data."
 run python ./fix_leaky_data.py
-
-echo "Disable Captive Portal Hijacking Attack."
-run defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -bool false
 
 echo "Set screen to lock almost as soon as the screensaver starts."
 run defaults write com.apple.screensaver askForPassword -int 1
@@ -229,17 +255,14 @@ run defaults write com.apple.screensaver askForPasswordDelay -int 5
 echo "Disable crash reporter."
 run defaults write com.apple.CrashReporter DialogType none
 
-echo "Enable Stealth Mode. Computer will not respond to ICMP ping requests or connection attempts from a closed TCP/UDP port."
-run defaults write /Library/Preferences/com.apple.alf stealthenabled -bool true
-
 echo "Enable AirDrop over Ethernet."
-defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
+run defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 
 #echo "Set all network interfaces to use Cloudflare DNS (1.1.1.1)."
 #run bash ./use_cloudflare_dns.sh
 
 echo "Disable wake on network access."
-run systemsetup -setwakeonnetworkaccess off
+run sudo systemsetup -setwakeonnetworkaccess off
 
 #echo "Disable Bonjour multicast advertisements."
 #run defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool YES
@@ -270,39 +293,6 @@ run defaults write com.apple.commerce AutoUpdate -bool true
 #else
 #    echo "${dim}▹ Facebook domains already blocked. $reset"
 #fi
-
-#-----------------------#
-# Install software deps #
-#-----------------------#
-echo
-chapter "Installing system software dependencies."
-
-# Note: Before installing Homebrew, set the following in your .bash_profile for increased privacy.
-#export HOMEBREW_NO_ANALYTICS=1
-#export HOMEBREW_NO_INSECURE_REDIRECT=1
-
-echo "Install Homebrew."
-which -s brew
-if [[ $? != 0 ]] ; then
-    run '/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"'
-else
-    run brew update
-fi
-
-echo "Install Mac App Store CLI"
-run brew install mas
-run brew upgrade mas
-
-echo "Checking for Mac App Store credentials..."
-mac_app_login=$(mas account | grep @)
-if [ -z "$mac_app_login" ] ; then
-  chapter "What is your Mac App Store email login? $bold"
-  read mac_app_login
-  run mas signin $mac_app_login
-fi
-
-echo "Install Xcode"
-run mas install 497799835
 
 #-----------------------#
 # Brew install software #
