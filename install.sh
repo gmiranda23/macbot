@@ -317,7 +317,7 @@ run git config --global user.name "gmiranda23"
 # youtube-dl - Download YouTube videos from the command-line (deprecated, but still handy)
 # yt-dlp - Fork of youtube-dl with additional features and fixes
 
-brewcli="node ffmpeg jq shellcheck speedtest-cli tldr wget youtube-dl yt-dlp"
+brewcli="node ffmpeg jq shellcheck speedtest-cli tldr wget youtube-dl yt-dlp awscli"
 
 for i in $brewcli ; do
   echo "Install $i"
@@ -338,15 +338,16 @@ done
 # paintbrush - Simple MacOS image editor
 # skype - Video chat, voice call and instant messaging application
 # spotify - Music streaming service
-# timer - Stopwatch, alarm clock, and clock utility
+# sublime-text - Text editor for code, markup and prose
+# timer - Stopwatch, alarm clock, and clock utility (deprecated)
 # vlc - Multimedia player
 # visual-studio-code -  Microsoft Visual Studio Code, open-source code editor
 # zoom - Video communication and virtual meeting platform
 # firefox - Mozilla Firefox web browser
 # google-chrome - Google Chrome web browser
 
-brewcasks="aerial atom audacity choosy dropbox iterm2 menumeters moom paintbrush
-skype spotify timer vlc visual-studio-code zoom firefox google-chrome"
+brewcasks="audacity choosy dropbox iterm2 menumeters moom paintbrush
+skype spotify sublime-text vlc visual-studio-code zoom firefox google-chrome"
 
 for ii in $brewcasks ; do
   echo "Install $ii"
@@ -388,10 +389,10 @@ chapter "Installing Mac App Store applications."
 #--------------------------------------
 declare -a mas_array=(
   ["1333542190"]="1Password 7"
-  ["808647808"]="Activity Timer"
+  ["1525288396"]="Time Timer"
   ["803453959"]="Slack"
   ["1153157709"]="Speedtest by Ookla"
-  ["533696630"]="Webcam Settings"
+  ["1525288396"]="Webcam Effects"
 )
 
 for key in ${!mas_array[@]}
