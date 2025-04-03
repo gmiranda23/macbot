@@ -316,6 +316,8 @@ run git config --global user.name "gmiranda23"
 # wget - Internet file retriever
 # youtube-dl - Download YouTube videos from the command-line (deprecated, but still handy)
 # yt-dlp - Fork of youtube-dl with additional features and fixes
+# awscli - AWS CLI 2
+# gh - Github CLI tools
 
 brewcli="node ffmpeg jq shellcheck speedtest-cli tldr wget youtube-dl yt-dlp awscli"
 
